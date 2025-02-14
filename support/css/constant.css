@@ -1,0 +1,225 @@
+/*
+//////////////////////////////////////////////////////////////
+//   ALL SIZE WIDTH HEIGHT PADDING MARGIN TRANSITION
+/////////////////////////////////////////////////////////////
+*/
+:root{
+  --marginM1:2.5px;
+  --marginM2:5px;
+  --marginM3:10px;
+  --marginM4:20px;
+
+  --paddingM1:2.5px;
+  --paddingM2:5px;
+  --paddingM3:10px;
+  --paddingM4:20px;
+
+  --fontM1:1em;
+  --fontM2:1.2em;
+  --fontM8:2em;
+  --fontM9:2.5em;
+
+  --heightM1:10px;
+  --heightM2:20px;
+  --heightM22:22px;
+  --heightM25:25px;
+  --heightM3:30px;
+  --heightM4:40px;
+  --heightM5:50px;
+  --heightM6:60px;
+  --heightM7:70px;
+  --heightM8:80px;
+  --heightJ1:100px;
+  --heightJ2:200px;
+  --heightJ3:300px;
+  --heightJ4:400px;
+  --heightJ45:450px;
+  --heightJ5:500px;
+  --heightJ6:6000px;
+  --heightJ7:700px;
+  --heightJ8:800px;
+  --heightJ9:900px;
+
+  --radiusM1:2px;
+  --radiusM2:5px;
+  --radiusM2_5:7px;
+  --radiusM3:10px;
+  --radiusM4:20px;
+  --radiusM45:30px;
+  --radiusM5:50px;
+
+  --widthM1:10px;
+  --widthM2:20px;
+  --widthM3:30px;
+  --widthM4:40px;
+  --widthM5:50px;
+  --widthM55:75px;
+  --widthM6:60px;
+  --widthM7:70px;
+  --widthM8:80px;
+  --widthM9:90px;
+  --widthJ1:100px;
+  --widthJ2:200px;
+  --widthJ3:300px;
+  --widthJ4:400px;
+  --widthJ45:450px;
+  --widthJ5:500px;
+  --widthJ6:6000px;
+  --widthJ7:700px;
+  --widthJ8:800px;
+  --widthJ9:900px;
+
+  --sizeM0:1px;
+  --sizeM1:2px;
+  --sizeM2:5px;
+  --sizeM3:10px;
+  --sizeM4:20px;
+  --sizeM5:50px;
+
+  --tran-05: all 0.5s ease;
+  --tran-03: all 0.3s ease;
+  --tran-02: all 0.2s ease;
+}
+/*
+//////////////////////////////////////////////////////////////
+//   EACH SIZE WIDTH HEIGHT PADDING MARGIN TRANSITION
+/////////////////////////////////////////////////////////////
+*/
+:root{
+  --tabButtonSize:20px;
+
+  --vAccHeight:30px;
+  --priPadding:10px;
+  --tabSelWidth:180px;
+
+  --tabContentPadding:0 12px;
+  --switchSize:75px;
+
+  --navHeight:50px;
+  --menuHeight:40px;
+  --lineHeight:30px;
+  --scrlen1:1;
+  --scrlen2:1;
+  --monPanWid:100vw;
+  --monPanDur:60s;
+  --cmtBxWid:600px;
+
+  --sidenav-width:250px;
+  --dropDownWidth:180px;
+  --liicoSize:30px;
+}
+/*
+///////////////////////////////////////////////////////
+//      COLORS THEME LIGHT
+///////////////////////////////////////////////////////
+*/
+:root{
+  --priFont:#111;
+  --secFont:#ccc;
+  --text-color:#333;
+  --text-icolor:#d4d4d4;
+
+  --priBg:#ccc;
+  --secBg:#eee;
+  --priAccBg:#aaa;
+  --fulBg:#dadada;
+  --terBg:#bbb;
+  --active:#aaa;
+
+  --rowOddBg:#ccc;
+  --rowEveBg:#eee;
+
+  --priFg:#fff;
+  --secFg:#28810d;
+  --terFg:#c00;
+
+  --priHover:#c1c1c1;
+  --secHover:rgb(0,96,223);
+
+  --priBorder:#777;
+  --secBorder:#555;
+  --terBorder:#000;
+  --qadBorder:#aaa;
+
+  --priShadow:#aaa;
+  
+  --hoverColor:#00ac92;
+  --hoverColorSec:blueviolet;
+  --enableColor:dodgerblue;
+
+  --primary-color:#222;
+  --panel-color:#ddd;
+  --panel2-color:#FFF;
+
+  --scrl-back:#fff;
+  --scrl-front:#aaa;
+
+  --box-shadow:#aaaaaa;
+
+  --button-color:#fff;
+  --button-back:#249c00;
+  --button-front:#fff;
+
+  --black-light-color:#464646;
+  --border-color:#929292;
+  --toggle-color:#000;
+    
+  --box1-color:#d8d8d8;
+
+  --hover-back:#d4d4d4;
+  --hover-front:#000;
+}
+/*
+///////////////////////////////////////////////////////
+//      COLORS THEME DARK
+///////////////////////////////////////////////////////
+*/
+body.dark{
+  --priFont:#ccc;
+  --secFont:#111;
+  --text-color:#ccc;
+  --text-icolor:#333;
+
+  --priAccBg:#555;
+  --priBg:#333;
+  --secBg:#111;
+  --fulBg:#000;
+  --terBg:#5a5656;
+
+  --rowOddBg:#333;
+  --rowEveBg:#111;
+
+  --terBorder:#aaa;
+  --qadBorder:#555;
+
+  --active:#333333;
+
+  --priShadow:#777;
+
+  --priHover:#272727;
+  --secHover:dodgerblue;
+
+  --priFg:#fff;
+  --secFg:greenyellow;
+  --terFg:orangered;
+
+  --primary-color: #3A3B3C;
+  --panel-color: #242526;
+  --panel2-color: #333;
+
+  --scrl-back:#000;
+  --scrl-front:#333;
+
+  --button-back:#249c00;
+  --button-front:#fff;
+
+  --box-shadow:#4e4e4e;
+  --black-light-color: #CCC;
+  --border-color: #4D4C4C;
+  --toggle-color: #FFF;
+
+  --box1-color:#303030;
+    
+  --hover-back:#333;
+  --hover-front:#fff;
+}
