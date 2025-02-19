@@ -17,9 +17,10 @@ updateVal=(d=new Date())=>{if(typeof d=="string")d=new Date(d);if(!(d instanceof
   let td=d.getDate(),tm=d.getMonth(),ty=d.getUTCFullYear(),th=d.getHours(),ti=d.getMinutes();let ed=dopt.children[td],ei=tmn.children[ti],eh=thr.children[th];
   this.changeVal([[tm+1,2,"m"],[ty,4,"y"],[td,2,"d",dopt,ed],[th,2,"h",thr,eh],[ti,2,"i",tmn,ei]]);mopt.value=tm;yopt.value=ty; }
 
+AdjustDays(sy,sm,op,clb=()=>{}){op.innerHTML="";let days=new Date(sy,sm,0).getDate();for(let d=1;d<=days;d++){let nd=document.createElement("div");nd.value=d;nd.textContent=d+" ";op.appendChild(nd);nd.classList.add("dtp-day-itm");nd.onclick=()=>clb(nd,op); } };
+  
 connectedCallback(){let date=new Date();let mNames=["January","February","March","April","May","June","July","August","September","October","November","December"];
 
-    if(this.hasAttribute("value"))value=this.getAttribute("value");
     if(this.hasAttribute("onSelected"))this.onSelected=eval(this.getAttribute("onSelected"));
 
     let lbl=this.lbl=document.createElement("span");this.appendChild(lbl);
@@ -50,7 +51,9 @@ connectedCallback(){let date=new Date();let mNames=["January","February","March"
     yopt.value=date.getFullYear();
     mopt.value=date.getMonth();
 
-    this.AdjustDays(yopt.value,parseInt(mopt.value)+1,dopt,(t,p)=>{this.changeVal(t.textContent,2,"d",p,t); });this.updateVal(date);
+    function AdjustDays(sy,sm,op,clb=()=>{}){op.innerHTML="";let days=new Date(sy,sm,0).getDate();for(let d=1;d<=days;d++){let nd=document.createElement("div");nd.value=d;nd.textContent=d+" ";op.appendChild(nd);nd.classList.add("dtp-day-itm");nd.onclick=()=>clb(nd,op); } };
+
+    AdjustDays(yopt.value,parseInt(mopt.value)+1,dopt,(t,p)=>{this.changeVal(t.textContent,2,"d",p,t); });this.updateVal(date);
 
     lbl.style.cssText=`width:inherit;display:inline-block;height:inherit;text-wrap:no-wrap;overflow-x:scroll; `;
     mct.classList.add("dtp-main-pan");
@@ -86,10 +89,8 @@ connectedCallback(){let date=new Date();let mNames=["January","February","March"
    document.addEventListener("click",(e)=>{let t=e.target;if(t==lbl)return;let p=t;for(let i=0;i<6;i++){p=p.parentElement;if(!p)return;if(p==mct){return; }; };if(!mct.classList.contains("dtp-closed"))mct.classList.add("dtp-closed"); });
 
     this.appendChild(mct);
+    if(this.hasAttribute("value"))this.value=this.getAttribute("value");
   }
-
-  AdjustDays(sy,sm,op,clb=()=>{}){op.innerHTML="";let days=new Date(sy,sm,0).getDate();for(let d=1;d<=days;d++){let nd=document.createElement("div");nd.value=d;nd.textContent=d+" ";op.appendChild(nd);nd.classList.add("dtp-day-itm");nd.onclick=()=>clb(nd,op); } };
-
 }
 
 class TimePicker extends HTMLElement{_vals={d:"00",m:"00",y:"0000",h:"00",i:"00",s:"00"};_spl="-";realTime=new Date();

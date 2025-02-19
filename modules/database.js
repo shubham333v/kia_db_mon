@@ -14,17 +14,22 @@ options:{encrypt:true,enableArithAbort:true,database:'QASUPERVISOR',trustedConne
 mysql=null;res_mssql_1=null;maxCon=10;_que=[];_curQue=false;
 
 nxtQry=()=>{if(!this.mysql)return setTimeout(()=>{this.nxtQry(); },1000);if(this._curQue||this._que.length<=0)return;this._curQue=true;
+console.log("QUES",this._curQue,this._que.length);
 let cq=this._que.shift();let q=cq.q,clb=cq.clb;let req=new Request(q,function(e){if(e){clb(e); } });let rows=[];
 req.on('row',(rw)=>{let row={};rw.forEach((c)=>{if(!c)return;row[c.metadata.colName]=c.value; });rows.push(row); });
-req.on('error',(err)=>{clb(WebRes.CCD.DE,rows);this.nxtQry(); });
-req.on('doneInProc',()=>{clb(null,rows);setTimeout(()=>{this._curQue=false;this.nxtQry(); },1); });if(this.mysql)this.mysql.execSql(req); }
+req.on('error',(err)=>{this._curQue=false;clb(WebRes.CCD.DE,rows);this.nxtQry(); });
+req.on('doneInProc',()=>{clb(null,rows); });
+req.on('doneProc',()=>{this._curQue=false; });
+req.on('requestCompleted',()=>{setTimeout(()=>{this._curQue=false;this.nxtQry(); },1); });
+
+if(this.mysql)this.mysql.execSql(req); }
 
 query=(q,clb=()=>{})=>{if(!this.mysql)return clb("No db connected"),this._que.push({q:q,clb:clb});this._que.push({q:q,clb:clb});this.nxtQry();
 /*let req=new Request(q,function(e){if(e){clb(e); } });let rows=[];
 req.on('row',(rw)=>{let row={};rw.forEach((c)=>{if(!c)return;row[c.metadata.colName]=c.value; });rows.push(row); });
 req.on('doneInProc',()=>{clb(null,rows); });if(this.mysql)this.mysql.execSql(req);*/ }
 
-end_res_mssql_1=()=>{if(this.res_mssql_1)try{this.res_mssql_1.close();this.res_mssql_1=null; }catch(ee){};this.res_mssql_1=null; }
+end_res_mssql_1=()=>{this._curQue=false,this._qu=[];if(this.res_mssql_1)try{this.res_mssql_1.close();this.res_mssql_1=null; }catch(ee){};this.res_mssql_1=null; }
 
 res_query_1=(q,clb=()=>{})=>{let res_mssql_1=this.res_mssql_1=new Connection(this.config);
     res_mssql_1.on('connect',(err)=>{if(err){this.end_res_mssql_1();return clb(WebRes.CCD.DE,err); };

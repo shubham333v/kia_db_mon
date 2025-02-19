@@ -18,7 +18,6 @@ callReqs(rqn,p){let rq=this.req[rqn];if(!rq)return null;this.req[rqn].buf=p;if(t
   HTTP.post({url:rq.path,success:this.reqImpl.bind(this),error:(a)=>{},data:p,reqid:uuid});this.HTP.req=true;if(!this.HTP.serTout)this.HTP.serTout=setTimeout(()=>{POPPROG.show(); },this.HTP.Time_interv);return uuid; };
 }
 
-
 class Panel extends HTPBase{state={list:[],changed:false,listn:[],saved:false};store={};uuid=generateUUID();idName="panel";
 showToast(a,b){if(typeof a=="object")a=JSON.stringify(a);if(typeof b=="string")b=TOASTBOX.type[b];TOASTBOX.toast(a,b); }
 
@@ -39,7 +38,7 @@ bufrStor(){let sr=Object.keys(this.store);for(let i=0;i<sr.length;i++){let ts=th
 memoStor(){let sr=Object.keys(this.store);for(let i=0;i<sr.length;i++){let ts=this.store[sr[i]];ts.val=ts.buf; }; }
 initStor(){let sr=Object.keys(this.store);for(let i=0;i<sr.length;i++){let ts=this.store[sr[i]];ts.elm[ts.type]=ts.buf=ts.val; };this.isChange(); }
 
-isChange(){let sr=Object.keys(this.store);this.setState({saved:true});for(let i=0;i<sr.length;i++){let ts=this.store[sr[i]];if(ts.elm[ts.type]!=ts.val){return this.setState({saved:false}); } }; }
+isChange(){let sr=Object.keys(this.store);this.setState({saved:true});for(let i=0;i<sr.length;i++){let ts=this.store[sr[i]];if(ts.elm[ts.type]!=ts.val){return this.setState({saved:false}); }}; }
 
 initPageCtrl(){return(<samp className="pageCtrl">
 <span className="datRef" ref={this.datRefRef}><i class="fa-solid fa-retweet"></i></span>
@@ -70,17 +69,17 @@ set itemHead(a){this._itmHead=a; }
 get itemMids(){if(this._itmMids!=null)return this._itmMids;return(<div className='divListItemHead listItemHead'><span>Name</span><span>Type</span><i></i><i></i></div>); }
 set itemMids(a){this._itmMids=a; }
 
-get itemFoot(){if(this._itmFoot!=null)return this._itmFoot;return(<div className={'listItem adder listFoot '+this.itemClass} onClick={()=>this.newPan()}><span><i className="fa-solid fa-square-plus" style={{border:"none"}}></i></span></div>); }
+get itemFoot(){if(this._itmFoot!=null)return this._itmFoot;return(<div className={'listItem adder listFoot '+this.itemClass} onClick={()=>this.newPan()}><span><i className="fa-solid fa-square-plus" style={{border:"none" }}></i></span></div>); }
 set itemFoot(a){this._itmFoot=a; }
 
 getItemMids(a){return(<div className={'listItemMids listItem '+this.itemClass}>{a}</div>); }
 getItemHead(a){return(<div className={'listItemHead listItem '+this.itemClass}>{a}</div>); }
-getItemFoot(a=null){return(<div className={'listItem adder listFoot '+this.itemClass} onClick={()=>this.newPan()}>{a?a:<span><i className="fa-solid fa-square-plus" style={{border:"none"}}></i></span>}</div>); }
+getItemFoot(a=null){return(<div className={'listItem adder listFoot '+this.itemClass} onClick={()=>this.newPan()}>{a?a:<span><i className="fa-solid fa-square-plus" style={{border:"none" }}></i></span>}</div>); }
 
 _lisReq(e){let d;if(!e){d=this.back; }else{d=e.target.checked;this.back=d; };this.callReqs(d?"listingback":"listing"); }
 
 changed(){this.setState({changed:!this.state.changed}); }
-clrActive(){for(let i=0;i<this.state.list.length;i++){this.state.list[i].class.setActive(false); }; }
+clrActive(){for(let i=0;i<this.state.list.length;i++){this.state.list[i].class.setActive(false); };}
 
 changedList(){}
 

@@ -4,24 +4,14 @@
     "stop": "killall -9 node"
   },
   "dependencies": {
-    "@babel/plugin-transform-react-jsx-development": "^7.25.9",
-    "@glideapps/glide-data-grid": "^6.0.3",
     "bcrypt": "^5.1.1",
-    "cron": "^3.2.1",
     "express": "^4.19.2",
-    "express-ws": "^5.0.2",
-    "mssql": "^11.0.1",
-    "mysql": "^2.18.1",
-    "nedb": "^1.8.0",
     "node-cron": "^3.0.3",
-    "nodemailer": "^6.9.16",
-    "nodemon": "^3.1.9",
-    "socket.io": "^4.7.5",
+    "npm-pack-all": "^1.12.7",
     "sqlite3": "^5.1.7",
     "tedious": "^18.6.1",
     "tedious-connection-pool": "^1.0.5",
-    "uuid": "^10.0.0",
-    "websocket": "^1.0.35"
+    "uuid": "^10.0.0"
   },
   "name": "testreport",
   "version": "1.0.0",
@@ -31,12 +21,5 @@
   "directories": {
     "doc": "doc"
   },
-  "description": "",
-  "devDependencies": {
-    "babel-plugin-transform-es2015-arrow-functions": "^6.22.0",
-    "babel-plugin-transform-es3-member-expression-literals": "^6.22.0",
-    "babel-plugin-transform-es3-property-literals": "^6.22.0",
-    "babel-preset-es2015": "^6.24.1",
-    "babel-preset-stage-0": "^6.24.1"
-  }
+  "description": ""
 }

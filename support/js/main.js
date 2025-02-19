@@ -19,15 +19,13 @@ rq.success(this.responseText,hdr); }; }else if(typeof rq.error=="function")rq.er
 xhr.open("POST",rq.url,true);xhr.setRequestHeader("Content-Type","application/json");xhr.overrideMimeType("application/json; charset=x-user-defined" );
 if(typeof rq.data=="object")rq.data=JSON.stringify(rq.data);xhr.send(rq.data); },
 
-
-
 post:(rq={url:"",success:(a)=>{},error:(a)=>{},data:"",reqid:generateUUID()})=>{let xhr=new XMLHttpRequest();GLOBSERV.httpRequested=true;
 
 xhr.onreadystatechange=function(){if(this.readyState==4){GLOBSERV.httpRequested=false;
 if(this.status==200){if(typeof rq.success=="function"){let hdr=HTTP.parseHttpHeaders(xhr.getAllResponseHeaders());
 if(rq.url=="/lcredin"){if(hdr.auth=="false"&&hdr.authtype=="login")return alert("Password or id wrong");
   localStorage.setItem("sid",hdr.sid);localStorage.setItem("uid",hdr.uid);localStorage.setItem("rwmod",hdr.rwmod); };let rs={};try{rs=JSON.parse(this.responseText); }catch(ee){}
-rq.success({res:rs.res||null,query:rs.data,reqid:hdr.reqid,auth:hdr.auth,path:hdr.path}); }; }else if(typeof rq.error=="function")rq.error(this.status); } };
+rq.success({res:rs.res||null,extra:rs.extra||{},query:rs.data,reqid:hdr.reqid,auth:hdr.auth,path:hdr.path}); }; }else if(typeof rq.error=="function")rq.error(this.status); } };
 
 xhr.open("POST",rq.url,true);xhr.setRequestHeader("Content-Type","application/json");
 if(rq.url!="/lcredin"){xhr.setRequestHeader("sid",localStorage.getItem("sid"));xhr.setRequestHeader("rwmod",localStorage.getItem("rwmod"));xhr.setRequestHeader("uid",localStorage.getItem("uid"));xhr.setRequestHeader("reqid",rq.reqid);xhr.setRequestHeader("path",rq.url); }

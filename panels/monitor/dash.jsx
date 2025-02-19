@@ -13,13 +13,18 @@ addRow(a=[]){let tbl=this.tblRef.current;let r=tbl.insertRow(-1);for(let i=0;i<a
 
 render(){let datag=this.datag;return(
 <div style={{height:"inherit"}} className="dash-1-pan">
-<div className='main-panel-head'>
+ <div className='main-panel-head'>
     <div className="an_fil_pic">
       <samp><label>Fr : </label><pick-datetime ref={this.filDateFr}/></samp>
       <samp><label>TO : </label><pick-datetime ref={this.filDateTo}/></samp>
-      <samp className="pageCtrl"><span className="datRef" ref={this.datRefRef}><i class="fa-solid fa-retweet"></i></span></samp>
+      <samp className="pageCtrl">
+        <span className="datRef" ref={this.datRefRef}><i className="fa-solid fa-retweet"></i></span>
+        <span className="datRef" onClick={()=>{this.toPdf(); }}><i class="fa-solid fa-file-pdf"></i></span>  
+      </samp>
     </div>
+    <samp className="live_but">LIVE : <label className="liv-ck-bx"><input type="checkbox" className="check-live" id={"mainLive"}/><label htmlFor={"mainLive"}></label></label></samp>
   </div>
+<div id="expDashPan" style={{width:"100%",height:"100%",overflow:"hidden"}}>
   <div className="dash-pan-main-label">◾ DCM Torque Audit Dashoard Report <div className="dash-pan-main-logo"><img src="/cont/kia_lgo.png"/></div></div>
   <div className="dash-pan-top">
     <samp className="dash-pan-top-tars">
@@ -58,9 +63,16 @@ render(){let datag=this.datag;return(
       </table>
     </div>
   </div>
+</div>
 </div>); }
 
-componentDidMount(){
+toPdf=()=>{let expDashPan=document.getElementById('expDashPan');let d1=this.filDateFr.current.value;let d2=this.filDateTo.current.value;d1=d1.replace(/[:.\-Zz\s]+/g,"");
+d2=d2.replace(/[:.\-Zz\s]+/g,"");let fn="dashboard_"+d1+"_"+d2+".pdf";let options={margin:1,filename:fn,image:{type:'jpeg',quality:0.98},
+html2canvas:{scale:5,x:0,y:0,width:(expDashPan.clientWidth*2.2),unit:"px"},
+jsPDF:{unit:'px',format:'a2',orientation:'l',precision:3  } };html2pdf().set(options).from(expDashPan).save(); }
+
+componentDidMount(){this.state.live=false;let mainLive=document.getElementById("mainLive");mainLive.onchange=()=>{this.setState({live:mainLive.checked}); }
+mainLive.checked=true;
   let fri=this.filDateFr.current;
   let toi=this.filDateTo.current;
 
@@ -71,15 +83,21 @@ componentDidMount(){
   fri.onchanged=(a)=>{if(TABWINDOW)TABWINDOW.extDat.share=TABWINDOW.extDat.share||{};TABWINDOW.extDat.share.fri=fri.realDate; }
   toi.onchanged=(a)=>{if(TABWINDOW)TABWINDOW.extDat.share=TABWINDOW.extDat.share||{};TABWINDOW.extDat.share.toi=toi.realDate; }
 
-this.updtReqs("listingrepone","/report/two",this._lispar.bind(this));this.initReqs();
-let datRefRef=this.datRefRef.current;datRefRef.onclick=()=>{this.setState({list:[]});setTimeout(()=>{this.callReqs("listingrepone",{date:{fr:fri.value,to:toi.value}}); },1); }
+this.updtReqs("listingrepone","/report/two",this._lispar.bind(this));
+this.updtReqs("listingrepcur","/report/curr",this._lispar.bind(this));
+this.initReqs();
+
+setInterval(()=>{if(!mainLive.checked)return;this.callReqs("listingrepcur"); },10000);let datRefRef=this.datRefRef.current;
+datRefRef.onclick=()=>{if(mainLive.checked)return this.showToast("Live Monitoring is On","warning");this.setState({list:[]});
+setTimeout(()=>{this.callReqs("listingrepone",{date:{fr:fri.value,to:toi.value}}); },1); }
 }
 
-_lispar(a){let d=a;let res=d.res,q=d.query;
-  if(res==WebRes.CCD.DE){return this.showToast("Database Error : "+((q&&q.code&&q.code=="ELOGIN")?"Mismatched Database setting or password,username or database name":"")); };
-  if(d.res){return this.showToast(d.res,"error"); };let dv=d.query;if(!dv)return;this._parseData(dv); }
+_lispar(a){let d=a;let res=d.res,q=d.query;if(res==WebRes.CCD.DE){return this.showToast("Database Error : "+((q&&q.code&&q.code=="ELOGIN")?"Mismatched Database setting or password,username or database name":"")); };if(d.res){return this.showToast(d.res,"error"); };let dv=d.query;if(!dv)return;this._parseData(dv,d.extra.fr,d.extra.to); }
 
-_parseData(dv){if(!dv)return;let m_wise={};let l_wise={};let datag=this.datag;datag.TOTAL=0;datag.OK=0;datag.NG=0;
+_parseData(dv,fr,to){if(!dv)return;let m_wise={};let l_wise={};let datag=this.datag;datag.TOTAL=0;datag.OK=0;datag.NG=0;
+if(fr){let fri=this.filDateFr.current;fri.updateVal(fr); };
+if(to){let toi=this.filDateTo.current;toi.updateVal(to); };
+
 for(let i=0;i<dv.length;i++){let di=dv[i];let cm=(di.Route||"").split("_")[0];let cl=di.Inspection.split(" ")[0];let cr=di["Result Status"]==1;let iss=di["Target Object"];
 let date=di["Result Date"];let act=di["Torque"];let ttg=di["Torque target"],ce=di["_coieff"],dec=di["_decim"]||3;ttg=ttg||"0";let ttl=di["_torqtol"]||"0";if(ttl>0&&ce>0){ttl*=ce; };
 if(ttg>0&&ce>0){ttg*=ce; };if(act>0&&ce>0){act*=ce; };ttl=(ttg*ttl)/10.1972;ttg=parseFloat(ttg)||0;ttl=parseFloat(ttl)||0;let tMax=(ttg+ttl).toFixed(dec),tMin=(ttg-ttl).toFixed(dec);ttg=ttg.toFixed(dec);let typ=null;if(act>tMax)typ="High";if(act<tMin)typ="Low";
@@ -94,7 +112,7 @@ let mods=this.datag.mwo.mods;mods.splice(0,mods.length);
 let mods_p=this.datag.mwi.mods;mods_p.splice(0,mods_p.length);
 let apr=this.datag.mwo.apr;apr.splice(0,apr.length);
 let rej=this.datag.mwo.rej;rej.splice(0,rej.length);
-let apr_p=this.datag.mwi.apr;apr.splice(0,apr_p.length);
+let apr_p=this.datag.mwi.apr;apr_p.splice(0,apr_p.length);
 
 for(let i=0;i<mk.length;i++){mods_p[i]=mods[i]=mk[i];apr[i]=(m_wise[mk[i]].ok);apr_p[i]=rej[i]=(m_wise[mk[i]].nok);let iss=m_wise[mk[i]].issue;let karr=Object.keys(iss);let varr=[];for(let j=0;j<karr.length;j++){varr.push(iss[karr[j]].cnt); };let mi=varr.indexOf(Math.max(...varr));if(mi>=0){let ck=karr[mi];let cb=iss[ck];this.addRow([i,mods_p[i],cb.chn,ck,cb.typ,cb.tMin+"~"+cb.tMax,cb.act.toFixed(2),cb.cnt,{high:cb.g_high,low:cb.g_low,act:cb.g_act},cb.date.replace(/[TZ]/g,"\n")]); }; };
 
@@ -145,7 +163,7 @@ let mods=this.props.mods||[];let apr=this.props.apr||[];let cls=this.props.cls;
 this.graph=new Chart(this.chart,{type:'doughnut',data:{labels:mods,datasets:[{data:apr,backgroundColor:cls.back}] },
     options:{cutout:30,responsive:true,layout:{padding:20},plugins:{datalabels:{color:cls.front,font:{size:"14px",weight:"800",lineHeight:1},
     formatter:(val, ctx)=>{let lb=ctx.chart.data.labels[ctx.dataIndex];let dps=ctx.chart.data.datasets[0].data;let ttl=dps.reduce((ttl,dp)=>ttl+dp,0);let p=val/ttl*100;
-      let fv=p.toFixed(2)+ "%";return`${lb}\n${fv}`; }},legend:{position:'top',display:false },title:{display:false },annotation:{annotations:{dLabel:{type:'doughnutLabel',content:({chart})=>{return chart.getDatasetMeta(0).total; },color:"black",font:{size:"18px",weight:"1000"} }} } }} });
+      let fv=p.toFixed(2)+ "%";return`${lb}\n${fv}`; }},legend:{position:'top',display:false },title:{display:false },annotation:{annotations:{dLabel:{type:'doughnutLabel',content:({chart})=>{return chart.getDatasetMeta(0).total; },color:"black",font:{size:"18px",weight:"1000" }} }} }} });
 
 this.changeTheme({detail:document.theme});document.removeEventListener("themechange",this.changeTheme);document.addEventListener("themechange",this.changeTheme); };
 

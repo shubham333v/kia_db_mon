@@ -272,3 +272,14 @@ nav.close li div .link-name{pointer-events:none; }
 .dash-pan-main-logo{display:inline-block;float:right;padding:var(--paddingM3);margin-right:var(--marginM3); }
 .dash-pan-main-logo{height:inherit; }
 .dash-pan-main-logo img{height:100%;vertical-align:top; }
+
+.check-live{display:none; }
+.check-live>*{pointer-events:none; }
+.check-live+label:after{font-family:'Font Awesome 6 Free';content:"\f057";color:var(--priFont); }
+.check-live:checked+label:after{font-family:'Font Awesome 6 Free';content:"\f8d9";color:#fff;
+text-shadow: 0 0 5px #ff005e, 0 0 10px #ff005e, 0 0 20px #ff005e, 0 0 40px #ff005e, 0 0 80px #ff005e;animation: glow 1.5s infinite alternate; }
+.check-live+label{display:inline-block;width:100%;cursor:pointer;font-size:var(--fontM1);line-height:var(--lineHeight);-webkit-user-select:none;-ms-user-select:none;user-select:none; }
+.check-live+label{line-height:var(--lineHeight);text-align:center; }
+.live_but{float:right;padding-left:var(--paddingM3); }
+.live_but>*{display:inline-block; }
+.liv-ck-bx{width:100px!important;font-size:1.2em; }

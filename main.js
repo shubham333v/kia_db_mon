@@ -39,6 +39,7 @@ global.ldbs.addEventListener("onReady",()=>{global.ldbs.query("SELECT*FROM dbsse
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 const MON_SET={mn_typ:"day",mn_shf_1:"6:30:0",mn_shf_2:"03:30:0",mn_shf_3:"22:30:0",fr:"",to:""}
+const CUR_REP={rows:[],err:null};
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 //            FUNCTIONS
@@ -60,6 +61,7 @@ function addZero(str){return str<10?('0'+str):str; }
 function getCrTimDt(d){let cdt=d||new Date();return addZero(cdt.getFullYear())+"-"+addZero(cdt.getMonth()+1)+"-"+addZero(cdt.getDate())+" "+addZero(cdt.getHours())+":"+addZero(cdt.getMinutes())+":"+addZero(cdt.getSeconds()); }
 function getCrDt(d){let cdt=d||new Date();return addZero(cdt.getFullYear())+"-"+addZero(cdt.getMonth()+1)+"-"+addZero(cdt.getDate()); }
 function getDfDt(dt2,dt1){let diff=(dt2-dt1)/1000;diff/=(60*60*24);return Math.abs(Math.round(diff)); }
+function DtToInt(a){return parseInt(a.replace(/[:.\-Zz\s]+/g,"")); }
 //////////////////////////////////////////////////////////////////////
 ///////////// ARRAY END
 /////////////////////////////////////////////////////////////////////
@@ -225,7 +227,9 @@ if(!global.dbs.setting.connected)return res.end(parseSend(WebRes.CCD.DE,global.d
   `+scm+`.TRACEABILITYTAGRESULT.NAME as 'Inspection Name',
   `+scm+`.TRACEABILITYTAGRESULT.VALUE as 'Inspection Value',
   NULL as '#Part',
-  NULL as '#Sample'
+  NULL as '#Sample',
+  NULL as '#Assignable Cause',
+  NULL as '#Corrective Action'
   from `+scm+`.EXECUTIONMEASURE
     LEFT JOIN `+scm+`.EXECUTION ON `+scm+`.EXECUTION.id=`+scm+`.EXECUTIONMEASURE.EXECUTION
     LEFT JOIN `+scm+`.MEASURINGINSTRUMENT ON `+scm+`.MEASURINGINSTRUMENT.id=`+scm+`.EXECUTION.MEASURINGINSTRUMENT
@@ -242,6 +246,12 @@ if(!global.dbs.setting.connected)return res.end(parseSend(WebRes.CCD.DE,global.d
    });
 /////////////////////////////////////////////
 /////////////////////////////////////////////
+//            REPORT
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+app.post("/report/curr",(req,res)=>{res.send(parseSend(CUR_REP.err,CUR_REP.rows,{fr:MON_SET.fr,to:MON_SET.to})); });
+/////////////////////////////////////////////
+/////////////////////////////////////////////
 //            EXTRAS
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -254,14 +264,25 @@ const TASKS={_tls:["day","mn_shf_1","mn_shf_2","mn_shf_3"],
                     nd=new Date();nd.setHours(23),nd.setMinutes(59),nd.setSeconds(59);MON_SET.to=getCrTimDt(nd); },
   upFrtShf:(fr="",to="",m=false)=>{let fs=fr.split(":"),ts=to.split(":");
                 let nd=new Date();nd.setHours(fs[0]||0),nd.setMinutes(fs[1]||0),nd.setSeconds(fs[2]||0);MON_SET.fr=getCrTimDt(nd);
-                    nd=new Date();if(m)nd.setDate(nd.getDate()+1);nd.setHours(ts[0]||6),nd.setMinutes(ts[1]||0);nd.setSeconds(ts[2]||0);MON_SET.to=getCrTimDt(nd); },
+                let nd_n=new Date();if(m)nd_n.setDate(nd_n.getDate()+1);nd_n.setHours(ts[0]||6),nd_n.setMinutes(ts[1]||0);nd_n.setSeconds(ts[2]||0);MON_SET.to=getCrTimDt(nd_n); },
+  getCurShf(){let mn_shf_1=MON_SET.mn_shf_1,mn_shf_2=MON_SET.mn_shf_2,mn_shf_3=MON_SET.mn_shf_3;
+    let fs=mn_shf_1.split(":"),ss=mn_shf_2.split(":"),ts=mn_shf_3.split(":");
+    let fd=new Date(),sd=new Date(),td=new Date(),cd=new Date();let ccd=DtToInt(getCrTimDt(cd))
+    fd.setHours(fs[0]||0),fd.setMinutes(fs[1]||0),fd.setSeconds(fs[2]||0);let rfd=getCrTimDt(fd);let cfd=DtToInt(rfd);
+    sd.setHours(ss[0]||0),sd.setMinutes(ss[1]||0),sd.setSeconds(ss[2]||0);let rsd=getCrTimDt(sd);let csd=DtToInt(rsd);
+    td.setHours(ts[0]||0),td.setMinutes(ts[1]||0),td.setSeconds(ts[2]||0);let rtd=getCrTimDt(td);let ctd=DtToInt(rtd);
+    if(cfd<=ccd&&csd>ccd)return{fr:rfd,to:rsd};
+    if(csd<=ccd&&ctd>ccd)return{fr:rsd,to:rtd};
+      fd.setDate(fd.getDate()+1);cfd=getCrTimDt(fd);
+    if(ctd<=ccd&&cfd>ccd)return{fr:rtd,to:rfd};
+  },
   stopAll(){for(let i=0;i<this._tls.length;i++){let ct=this._tls[i];if(this[ct])this[ct].stop(); }; }
 };
 
 global.ldbs.addEventListener("onReady",()=>{global.ldbs.query("SELECT*FROM monset;",(a,b)=>{if(a)return;let ms={};if(b&&typeof b=="object")for(let i=0;i<b.length;i++){let bi=b[i];if(bi&&bi.keynme){ms[bi.keynme]=bi.keyval; }};updateTasks(ms.mn_typ,ms.mn_shf_1,ms.mn_shf_2,ms.mn_shf_3); },global.ldbs._ALL); });
 
-updateTasks=(mn_typ="day",mn_shf_1="6:30:00",mn_shf_2="15:30:00",mn_shf_3="22:30:00")=>{
-  MON_SET.mn_typ=mn_typ;MON_SET.mn_shf_1=mn_shf_1;MON_SET.mn_shf_2=mn_shf_2;MON_SET.mn_shf_2=mn_shf_3;
+updateTasks=(mn_typ="day",mn_shf_1="6:30:00",mn_shf_2="15:30:00",mn_shf_3="22:30:00")=>{let crsh={};
+  MON_SET.mn_typ=mn_typ;MON_SET.mn_shf_1=mn_shf_1;MON_SET.mn_shf_2=mn_shf_2;MON_SET.mn_shf_3=mn_shf_3;
 
   let t1=mn_shf_1,t_1=[0,0,0];t_1=t1.split(":");t_1=t_1.join(" ");
   let t2=mn_shf_2,t_2=[0,0,0];t_2=t2.split(":");t_2=t_2.join(" ");
@@ -269,18 +290,18 @@ updateTasks=(mn_typ="day",mn_shf_1="6:30:00",mn_shf_2="15:30:00",mn_shf_3="22:30
 
 switch(mn_typ){
   case "day":TASKS.stopAll();TASKS.upFrtDay();TASKS.day=cron.schedule('0 0 0 * * *',()=>{TASKS.upFrtDay(); });break;
-  case "shift_2":TASKS.stopAll();TASKS.upFrtShf(t1,t2);
+  case "shift_2":TASKS.stopAll();crsh=TASKS.getCurShf();MON_SET.fr=crsh.fr;MON_SET.to=crsh.to;
         TASKS.mn_shf_1=cron.schedule(t_1+' * * *',()=>{TASKS.upFrtShf(t1,t2); });
         TASKS.mn_shf_2=cron.schedule(t_2+' * * *',()=>{TASKS.upFrtShf(t2,t3); });break;
 
-    case "shift_2":TASKS.stopAll();TASKS.upFrtShf(t1,t2);
+  case "shift_3":TASKS.stopAll();crsh=TASKS.getCurShf();MON_SET.fr=crsh.fr;MON_SET.to=crsh.to;
         TASKS.mn_shf_1=cron.schedule(t_1+' * * *',()=>{TASKS.upFrtShf(t1,t2); });
         TASKS.mn_shf_2=cron.schedule(t_2+' * * *',()=>{TASKS.upFrtShf(t2,t3); });
         TASKS.mn_shf_3=cron.schedule(t_3+' * * *',()=>{TASKS.upFrtShf(t3,t1,true); });break;
   };
 }
 
-cron.schedule('0 * * * * *',()=>{repInterv(MON_SET.fr,MON_SET.to,(e,rw)=>{console.log("REPORT",MON_SET.fr,MON_SET.to); }); });
+cron.schedule('0 * * * * *',()=>{repInterv(MON_SET.fr,MON_SET.to,(e,rw)=>{CUR_REP.rows=rw;CUR_REP.err=e;console.log("REPORT",MON_SET.fr,MON_SET.to); }); });
 
 app.get('/favicon.ico',(req,res)=>{res.sendFile(__dirname+'/cont/logo.png'); });
 app.get('/',(req,res)=>{res.sendFile(__dirname+"/panels/monitor/index.html"); });
